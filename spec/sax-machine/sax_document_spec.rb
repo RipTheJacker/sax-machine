@@ -565,4 +565,41 @@ describe "SAXMachine" do
       @item.title.should == "Hello"
     end
   end
+  
+  describe "inheritance" do
+    before do
+      @parent = Class.new do
+        include SAXMachine
+        element :title
+      end
+
+      @child = Class.new(@parent) do
+        element :author
+      end
+    end
+    
+    it "should have the same elements as it's parent" do
+      @child.column_names.should include(:title)
+    end
+    
+    it "should have it's own elements" do
+      @child.column_names.should == [:title, :author]
+    end
+    
+    it "should have it's own sax_config" do
+      @child.sax_config.should_not == @parent.sax_config
+    end
+    
+    it "should not affect the parent sax_config" do
+      @parent.column_names.should == [:title]
+    end
+    
+    it "should parse elements" do
+      doc = @child.parse("<xml><title>My Title</title><author>Joe</author></xml>")
+      doc.title.should == "My Title"
+      doc.author.should == "Joe"
+    end
+    
+    it "it should behave like other sax-machine objects"
+  end
 end

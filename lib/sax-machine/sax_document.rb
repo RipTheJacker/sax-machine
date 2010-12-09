@@ -14,7 +14,7 @@ module SAXMachine
   end
   
   module ClassMethods
-
+    
     def parse(xml_text)
       new.parse(xml_text)
     end
@@ -76,6 +76,18 @@ module SAXMachine
     
     def sax_config
       @sax_config ||= SAXConfig.new
+    end
+    
+    def inherited(descendant)
+      sax_config.top_level_elements.each{ |name, elc|
+        descendant.sax_config.top_level_elements[name] = elc.dup
+      }
+      
+      sax_config.collection_elements.each{ |name, elc|
+        descendant.sax_config.collection_elements[name] = elc.dup
+      }
+      
+      super
     end
   end
   
